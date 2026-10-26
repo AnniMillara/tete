@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}Editar donación - Donaciones de Peluches{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card card-app">
+            <div class="card-header header-primary">
+                <h4 class="mb-0">Editar donación</h4>
+            </div>
+            <div class="card-body">
+                <form action="/actualizar/{{ peluche.id }}" method="POST" novalidate>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre del peluche</label>
+                        <input type="text" name="nombre" class="form-control" maxlength="100"
+                               value="{{ peluche.nombre }}">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea name="descripcion" class="form-control" rows="4"
+                                  maxlength="1000">{{ peluche.descripcion }}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary-action w-100">Actualizar</button>
+                </form>
+            </div>
+        </div>
+        <div class="stat-box mt-3 text-center">
+            Donaciones registradas: <strong>{{ total_donaciones }}</strong>
+        </div>
+    </div>
+</div>
+{% endblock %}

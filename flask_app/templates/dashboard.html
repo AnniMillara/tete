@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% block title %}Panel - Donaciones de Peluches{% endblock %}
+{% block content %}
+<div class="page-header">
+    <h2 class="mb-0">Panel de {{ session['usuario_nombre'] }}</h2>
+    <a href="/nueva_donacion" class="btn btn-primary-action">Nueva donación</a>
+</div>
+
+<div class="stat-box mb-4">
+    Donaciones registradas: <strong>{{ total_donaciones }}</strong>
+</div>
+
+<div class="table-responsive">
+    <table class="table app-table align-middle">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Donante</th>
+                <th class="text-end">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for p in peluches %}
+            <tr>
+                <td>{{ p.nombre }}</td>
+                <td>{{ p.donante }}</td>
+                <td class="text-end">
+                    <a href="/detalle/{{ p.id }}" class="btn btn-sm btn-outline-secondary">Ver</a>
+                    {% if p.usuario_id == session['usuario_id'] %}
+                        <a href="/editar/{{ p.id }}" class="btn btn-sm btn-outline-warning">Editar</a>
+                    {% else %}
+                        {% if p.adoptado %}
+                            <span class="badge status-adopted">Adoptado</span>
+                        {% else %}
+                            <form action="/adoptar/{{ p.id }}" method="POST" class="inline-form">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm btn-secondary-action">Adoptar</button>
+                            </form>
+                        {% endif %}
+                    {% endif %}
+                </td>
+            </tr>
+            {% else %}
+            <tr>
+                <td colspan="3" class="text-center text-muted py-3">
+                    Aún no hay peluches registrados.
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
