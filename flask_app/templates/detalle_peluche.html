@@ -4,28 +4,19 @@
 <div class="row justify-content-center">
     <div class="col-md-8">
         <div class="card card-app">
-            <div class="card-header header-primary text-center">
-                <h3 class="mb-0">{{ peluche.nombre }}</h3>
-            </div>
+            <div class="card-header header-primary text-center"><h3 class="mb-0">{{ peluche.nombre }}</h3></div>
             <div class="card-body">
                 <p><strong>Donante:</strong> {{ peluche.donante }}</p>
                 <p><strong>Descripción:</strong> {{ peluche.descripcion }}</p>
                 <p><strong>Visitas:</strong> {{ peluche.visitas }}</p>
-
                 {% if peluche.adoptado %}
-                    <div class="alert alert-success mb-3">
-                        Adoptado por: <strong>{{ peluche.adoptante }}</strong>
-                    </div>
+                    <div class="alert alert-success mb-3">Adoptado por: <strong>{{ peluche.adoptante or 'Usuario no disponible' }}</strong></div>
                 {% else %}
-                    <div class="alert alert-info mb-3">
-                        Este peluche sigue disponible.
-                    </div>
+                    <div class="alert alert-info mb-3">Este peluche sigue disponible.</div>
                 {% endif %}
-
-                <div class="stat-box mb-3">
-                    Donaciones registradas: <strong>{{ total_donaciones }}</strong>
-                </div>
-
+                {% if total_donaciones is not none %}
+                <div class="stat-box mb-3">Donaciones registradas: <strong>{{ total_donaciones }}</strong></div>
+                {% endif %}
                 <a href="/dashboard" class="btn btn-outline-secondary">Volver al panel</a>
             </div>
         </div>

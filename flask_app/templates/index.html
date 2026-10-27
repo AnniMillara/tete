@@ -4,57 +4,48 @@
 <div class="row justify-content-center g-4">
     <div class="col-md-6">
         <div class="card card-app">
-            <div class="card-header header-primary">
-                <h4 class="mb-0">Registro</h4>
-            </div>
+            <div class="card-header header-primary"><h4 class="mb-0">Registro</h4></div>
             <div class="card-body">
-                <form action="/registro" method="POST" novalidate>
+                <form action="/registro" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
-                        <label class="form-label">Nombre</label>
-                        <input type="text" name="nombre" class="form-control" maxlength="50"
-                               value="{{ reg_data.nombre if reg_data else '' }}">
+                        <label for="nombre" class="form-label">Nombre</label>
+                        <input id="nombre" type="text" name="nombre" class="form-control" minlength="2" maxlength="50" required value="{{ reg_data.nombre if reg_data else '' }}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Apellido</label>
-                        <input type="text" name="apellido" class="form-control" maxlength="50"
-                               value="{{ reg_data.apellido if reg_data else '' }}">
+                        <label for="apellido" class="form-label">Apellido</label>
+                        <input id="apellido" type="text" name="apellido" class="form-control" minlength="2" maxlength="50" required value="{{ reg_data.apellido if reg_data else '' }}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">E-mail</label>
-                        <input type="email" name="email" class="form-control" maxlength="100"
-                               value="{{ reg_data.email if reg_data else '' }}">
+                        <label for="registro-email" class="form-label">E-mail</label>
+                        <input id="registro-email" type="email" name="email" class="form-control" maxlength="100" required value="{{ reg_data.email if reg_data else '' }}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Contraseña</label>
-                        <input type="password" name="password" class="form-control">
+                        <label for="registro-password" class="form-label">Contraseña</label>
+                        <input id="registro-password" type="password" name="password" class="form-control" minlength="6" maxlength="72" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Confirmar contraseña</label>
-                        <input type="password" name="confirmar" class="form-control">
+                        <label for="confirmar" class="form-label">Confirmar contraseña</label>
+                        <input id="confirmar" type="password" name="confirmar" class="form-control" minlength="6" maxlength="72" required>
                     </div>
                     <button type="submit" class="btn btn-primary-action w-100">Crear cuenta</button>
                 </form>
             </div>
         </div>
     </div>
-
     <div class="col-md-6">
         <div class="card card-app">
-            <div class="card-header header-secondary">
-                <h4 class="mb-0">Inicio de sesión</h4>
-            </div>
+            <div class="card-header header-secondary"><h4 class="mb-0">Inicio de sesión</h4></div>
             <div class="card-body">
-                <form action="/login" method="POST" novalidate>
+                <form action="/login" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
-                        <label class="form-label">E-mail</label>
-                        <input type="email" name="email" class="form-control"
-                               value="{{ login_email if login_email else '' }}">
+                        <label for="login-email" class="form-label">E-mail</label>
+                        <input id="login-email" type="email" name="email" class="form-control" maxlength="100" required value="{{ login_email if login_email else '' }}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Contraseña</label>
-                        <input type="password" name="password" class="form-control">
+                        <label for="login-password" class="form-label">Contraseña</label>
+                        <input id="login-password" type="password" name="password" class="form-control" maxlength="72" required>
                     </div>
                     <button type="submit" class="btn btn-secondary-action w-100">Entrar</button>
                 </form>

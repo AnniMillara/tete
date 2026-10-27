@@ -4,29 +4,25 @@
 <div class="row justify-content-center">
     <div class="col-md-7">
         <div class="card card-app">
-            <div class="card-header header-primary">
-                <h4 class="mb-0">Nueva donación</h4>
-            </div>
+            <div class="card-header header-primary"><h4 class="mb-0">Nueva donación</h4></div>
             <div class="card-body">
-                <form action="/crear_peluche" method="POST" novalidate>
+                <form action="/crear_peluche" method="POST">
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                     <div class="mb-3">
-                        <label class="form-label">Nombre del peluche</label>
-                        <input type="text" name="nombre" class="form-control" maxlength="100"
-                               value="{{ datos.nombre if datos else '' }}">
+                        <label for="nombre-peluche" class="form-label">Nombre del peluche</label>
+                        <input id="nombre-peluche" type="text" name="nombre" class="form-control" minlength="3" maxlength="100" required value="{{ datos.nombre if datos else '' }}">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Descripción</label>
-                        <textarea name="descripcion" class="form-control" rows="4"
-                                  maxlength="1000">{{ datos.descripcion if datos else '' }}</textarea>
+                        <label for="descripcion" class="form-label">Descripción</label>
+                        <textarea id="descripcion" name="descripcion" class="form-control" rows="4" minlength="10" maxlength="1000" required>{{ datos.descripcion if datos else '' }}</textarea>
                     </div>
                     <button type="submit" class="btn btn-primary-action w-100">Publicar</button>
                 </form>
             </div>
         </div>
-        <div class="stat-box mt-3 text-center">
-            Donaciones registradas: <strong>{{ total_donaciones }}</strong>
-        </div>
+        {% if total_donaciones is not none %}
+        <div class="stat-box mt-3 text-center">Donaciones registradas: <strong>{{ total_donaciones }}</strong></div>
+        {% endif %}
     </div>
 </div>
 {% endblock %}

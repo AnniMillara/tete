@@ -1,4 +1,5 @@
 import os
+
 import pymysql
 from dotenv import load_dotenv
 
@@ -6,7 +7,7 @@ load_dotenv()
 
 
 class ErrorBaseDatos(Exception):
-    """Fallo controlado de conexión o consulta a MySQL."""
+    """Error controlado de acceso a la base de datos."""
 
 
 def obtener_conexion():

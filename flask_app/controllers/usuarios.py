@@ -1,9 +1,10 @@
 import re
 
-from flask import render_template, request, redirect, session, flash
-from config import bcrypt
+from flask import flash, redirect, render_template, request, session
+
+from flask_app.config import bcrypt
+from flask_app.config.conexion_bd import ErrorBaseDatos
 from flask_app.models.usuario import Usuario
-from config.conexion_bd import ErrorBaseDatos
 
 PATRON_EMAIL = re.compile(r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$")
 MAX_BYTES_PASSWORD = 72
@@ -20,7 +21,6 @@ def _password_es_valida(password):
 
 
 def init_usuarios(app):
-
     @app.route("/")
     def index():
         if "usuario_id" in session:
@@ -31,7 +31,7 @@ def init_usuarios(app):
     def registrar():
         nombre = request.form.get("nombre", "").strip()
         apellido = request.form.get("apellido", "").strip()
-        email = request.form.get("email", "").strip()
+        email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
         confirmar = request.form.get("confirmar", "")
 
@@ -40,7 +40,7 @@ def init_usuarios(app):
             errores.append("El nombre debe tener entre 2 y 50 caracteres.")
         if len(apellido) < 2 or len(apellido) > 50:
             errores.append("El apellido debe tener entre 2 y 50 caracteres.")
-        if len(email) > 100 or not PATRON_EMAIL.match(email):
+        if len(email) > 100 or not PATRON_EMAIL.fullmatch(email):
             errores.append("El correo electrónico no es válido.")
 
         ok_pw, msg_pw = _password_es_valida(password)
@@ -50,10 +50,9 @@ def init_usuarios(app):
             errores.append("Las contraseñas no coinciden.")
 
         datos_form = {"nombre": nombre, "apellido": apellido, "email": email}
-
         if errores:
-            for e in errores:
-                flash(e, "danger")
+            for error in errores:
+                flash(error, "danger")
             return render_template("index.html", reg_data=datos_form)
 
         hash_pw = bcrypt.generate_password_hash(password).decode("utf-8")
@@ -71,16 +70,21 @@ def init_usuarios(app):
         if exito:
             flash("Registro exitoso. Ya puedes iniciar sesión.", "success")
             return redirect("/")
+
         flash(mensaje, "danger")
         return render_template("index.html", reg_data=datos_form)
 
     @app.route("/login", methods=["POST"])
     def login():
-        email = request.form.get("email", "").strip()
+        email = request.form.get("email", "").strip().lower()
         password = request.form.get("password", "")
 
         if not email or not password:
             flash("Debes ingresar correo y contraseña.", "danger")
+            return render_template("index.html", login_email=email)
+
+        if len(email) > 100 or not PATRON_EMAIL.fullmatch(email):
+            flash("Credenciales incorrectas.", "danger")
             return render_template("index.html", login_email=email)
 
         if len(password.encode("utf-8")) > MAX_BYTES_PASSWORD:
@@ -93,10 +97,10 @@ def init_usuarios(app):
             flash("Servicio temporalmente no disponible. Intenta más tarde.", "danger")
             return render_template("index.html", login_email=email)
 
-        if usuario and bcrypt.check_password_hash(usuario["password"], password):
+        if usuario and usuario.password and bcrypt.check_password_hash(usuario.password, password):
             session.clear()
-            session["usuario_id"] = usuario["id"]
-            session["usuario_nombre"] = usuario["nombre"]
+            session["usuario_id"] = usuario.id
+            session["usuario_nombre"] = usuario.nombre
             return redirect("/dashboard")
 
         flash("Credenciales incorrectas.", "danger")

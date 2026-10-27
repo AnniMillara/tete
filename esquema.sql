@@ -22,8 +22,10 @@ CREATE TABLE IF NOT EXISTS peluches (
     adoptado_por INT DEFAULT NULL,
     visitas INT NOT NULL DEFAULT 0,
     creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_peluche_donante FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-    CONSTRAINT fk_peluche_adoptante FOREIGN KEY (adoptado_por) REFERENCES usuarios(id) ON DELETE SET NULL,
+    CONSTRAINT fk_peluche_donante FOREIGN KEY (usuario_id)
+        REFERENCES usuarios(id) ON DELETE CASCADE,
+    CONSTRAINT fk_peluche_adoptante FOREIGN KEY (adoptado_por)
+        REFERENCES usuarios(id) ON DELETE SET NULL,
     INDEX idx_peluche_usuario (usuario_id),
     INDEX idx_peluche_adoptado (adoptado)
 ) ENGINE=InnoDB;

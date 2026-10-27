@@ -1,48 +1,30 @@
 # Nido de Peluches
 
-Aplicación web para donar y adoptar peluches. Desarrollada con Flask, Jinja2,
-Bootstrap 5 y MySQL. Permite registrarse, iniciar sesión, publicar peluches,
-editarlos y adoptar los de otros usuarios.
+Aplicación web para publicar, donar y adoptar peluches. Está desarrollada con Flask, Jinja2, Bootstrap 5 y MySQL.
 
 ## Tecnologías
 
 - Python 3.10+
-- Flask 3.0.3
+- Flask
 - Flask-Bcrypt
-- Flask-WTF (CSRF)
+- Flask-WTF para protección CSRF
 - PyMySQL
 - python-dotenv
-- Bootstrap 5 (CDN)
 - MySQL
+- Bootstrap 5 mediante CDN
 
 ## Estructura
 
-```
-NidoDePeluches/
-├── flask_app/
-│   ├── controllers/
-│   ├── models/
-│   ├── templates/
-│   └── static/
-├── server.py
-├── db.py
-├── extensions.py
-├── esquema.sql
-├── requirements.txt
-├── .env.example
-├── .gitignore
-└── README.md
-```
-
-## Requisitos previos
-
-- Python 3.10 o superior
-- MySQL Server en ejecución
-- pip
+- `flask_app/config/`: configuración y conexión a la base de datos.
+- `flask_app/controllers/`: rutas y lógica de las solicitudes.
+- `flask_app/models/`: clases y consultas de los modelos.
+- `flask_app/templates/`: plantillas Jinja2.
+- `flask_app/static/`: CSS y JavaScript.
+- `esquema.sql`: creación de la base de datos y sus tablas.
 
 ## Instalación en Windows
 
-1. Abre CMD o PowerShell y sitúate en la carpeta del proyecto.
+1. Abre CMD o PowerShell en la carpeta del proyecto.
 2. Crea y activa un entorno virtual:
 
    ```bat
@@ -50,83 +32,57 @@ NidoDePeluches/
    .venv\Scripts\activate
    ```
 
-3. Instala dependencias:
+3. Instala las dependencias:
 
    ```bat
    python -m pip install -r requirements.txt
    ```
 
-4. Copia `.env.example` como `.env` y edita los valores:
+4. Copia `.env.example` como `.env` y completa las credenciales de MySQL.
+5. Genera una clave secreta con:
 
-   ```env
-   DB_HOST=localhost
-   DB_PORT=3306
-   DB_USER=tu_usuario
-   DB_PASSWORD=tu_contraseña
-   DB_NAME=nido_peluches
-   SECRET_KEY=una_clave_aleatoria_de_al_menos_32_caracteres
-   COOKIE_SECURE=false
+   ```bat
+   python -c "import secrets; print(secrets.token_hex(32))"
    ```
 
-   `SECRET_KEY` debe tener al menos 32 caracteres aleatorios.
-
-5. Ejecuta `esquema.sql` en MySQL para crear la base de datos y tablas.
-
-6. Inicia la aplicación:
+   Copia el resultado en `SECRET_KEY` dentro de `.env`.
+6. Ejecuta `esquema.sql` en MySQL.
+7. Inicia la aplicación:
 
    ```bat
    python server.py
    ```
 
-7. Abre `http://127.0.0.1:5000` en el navegador.
+8. Abre `http://127.0.0.1:5000`.
+
+## Configuración segura y errores comunes
+
+- No subas el archivo `.env` al repositorio. Contiene credenciales locales y `SECRET_KEY`.
+- No uses literalmente el valor de ejemplo de `SECRET_KEY`: la aplicación lo rechaza. Genera una clave propia con el comando de instalación.
+- Para desplegar con HTTPS, configura `COOKIE_SECURE=true`; para desarrollo local por HTTP, usa `false`.
+- Si aparece un mensaje de servicio temporalmente no disponible, revisa que MySQL esté iniciado, que el usuario y la contraseña de `.env` sean correctos y que hayas ejecutado `esquema.sql`. La aplicación muestra mensajes generales y no necesita revelar la excepción interna.
+- Las fechas se generan automáticamente en MySQL (`creado_en`); el usuario no introduce fechas en los formularios, por lo que no existe un campo de fecha que validar.
+
+## Comprobación manual antes de entregar
+
+1. Registra una cuenta y confirma que puedes iniciar y cerrar sesión.
+2. Intenta registrar dos veces el mismo correo y comprueba que se muestra un mensaje claro.
+3. Publica un peluche, edítalo y elimínalo.
+4. Inicia sesión con otra cuenta e intenta adoptar ese peluche; comprueba que no se pueda adoptar dos veces ni adoptar una donación propia.
+5. Intenta abrir las rutas privadas sin iniciar sesión y editar una donación de otra persona.
+6. Prueba nombres/descripciones vacíos y que excedan los límites; los datos deben rechazarse en el servidor.
 
 ## Funcionalidades
 
 - Registro e inicio de sesión con contraseñas hasheadas con Bcrypt.
-- Cierre de sesión mediante POST con CSRF.
-- Publicación de peluches para donación.
-- Listado y detalle de peluches.
-- Edición restringida al dueño.
+- Publicación, edición, eliminación y visualización de peluches.
 - Adopción de peluches de otros usuarios.
-- Contador de donaciones propias.
-- Contador de visitas que excluye al donante.
-- Visualización del nombre del adoptante.
-- Mensajes de validación claros.
-- Manejo de errores 403, 404 y 500.
+- Prevención de adopciones dobles mediante una actualización condicional en MySQL.
+- Contador de donaciones y visitas, sin contar las visitas del propio donante.
+- Protección CSRF en los formularios POST.
+- Diseño adaptable y mensajes de error generales.
+- Clave secreta validada al iniciar la aplicación y límite de tamaño para solicitudes.
 
-## Bonus incluidos
+## Antes de entregar
 
-1. Persistencia de datos del formulario ante errores de validación (registro,
-   nueva donación y edición).
-2. Contador de donaciones visible en el panel, en nueva donación, en edición
-   y en el detalle.
-3. Ocultación del botón de adoptar cuando el usuario es el dueño.
-4. Registro del adoptante y visualización de su nombre.
-5. Contador de visitas que no suma las visitas del donante.
-6. Adopción única mediante `UPDATE ... WHERE adoptado = FALSE`.
-
-## Bonus omitidos
-
-No se incluyó eliminación de publicaciones ni de cuentas porque no formaban
-parte de los requisitos evaluados.
-
-## Seguridad
-
-- Contraseñas limitadas a 72 bytes UTF-8 por el límite de Bcrypt.
-- Todas las operaciones que modifican datos usan POST y token CSRF.
-- Conexiones cerradas siempre con `finally`; `rollback` en errores.
-- Excepción controlada `ErrorBaseDatos` que impide mostrar detalles de MySQL.
-- Consultas parametrizadas.
-- `SECRET_KEY` obligatoria de al menos 32 caracteres.
-
-## Verificación realizada durante la preparación
-
-- Se comprobó la sintaxis de los 10 archivos Python mediante `ast.parse`.
-- Se comprobó la sintaxis Jinja de las 7 plantillas.
-- Se verificó que estén presentes los archivos principales esperados.
-- Se localizaron las 11 rutas Flask declaradas en los controladores.
-- Se comprobaron los 6 formularios HTML y todos incluyen `csrf_token`.
-- Se creó el ZIP y se verificó su integridad.
-- **No se pudo iniciar la aplicación ni ejecutar pruebas funcionales**: este entorno no tiene instalados Flask, Flask-Bcrypt, Flask-WTF ni PyMySQL, y no se conectó a un servidor MySQL real. Registro, inicio de sesión, publicación, edición, adopción y contador de visitas deben probarse después de instalar las dependencias y configurar MySQL.
-
-Estas comprobaciones son estáticas; no garantizan por sí solas que todos los flujos funcionen en ejecución.
+Ejecuta toda la comprobación manual anterior con tu propia instancia de MySQL. Revisa también que las variables de entorno y los nombres de las tablas y campos coincidan con el entorno de despliegue y con la pauta de evaluación.
